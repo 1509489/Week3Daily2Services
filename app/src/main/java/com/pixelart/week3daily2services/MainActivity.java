@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+
+
     }
 
     @Override
@@ -48,6 +50,21 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         initPerson();
         adapter.notifyDataSetChanged();
+
+        Intent intent = new Intent();
+        if (intent.getAction() != null)
+        {
+            Intent stopMusicIntent = new Intent(this, MusicPlayerService.class);
+            switch (intent.getAction())
+            {
+                case "stopMusic":
+                    stopMusicIntent.putExtra("stopMusic", "stopMusic");
+                    stopMusicIntent.setAction("stopMusic");
+                    startService(stopMusicIntent);
+                    break;
+
+            }
+        }
     }
 //TODO: Figure out a way to pass the data using broadcast receiver and display it on the recylerview
     private void initPerson()

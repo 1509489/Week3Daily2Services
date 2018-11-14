@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -89,20 +90,29 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
 
         }
 
+        CharSequence channel_name = "MyChannel";
+        CharSequence channel_description = "Foreground service channel";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channel_name, importance);
+            channel.setDescription(String.valueOf(channel_description));
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
 
 
-        Intent notificationIntent = new Intent(this, MusicPlayerService.class);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.putExtra("stopMusic", "stopMusic");
         notificationIntent.setAction("stopMusic");
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0, notificationIntent, 0);
 
-        PendingIntent stopMusicIntent = PendingIntent.getActivity(this, 0 , notificationIntent, 0);
 
         Notification notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_play)
                 .setContentTitle(contentTitle).setContentText(contentText)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent).addAction(0, "Stop Music", stopMusicIntent)
+                .setContentIntent(pendingIntent).addAction(0, "Stop Music", pendingIntent)
                 .setAutoCancel(true).build();
 
         startForeground(1,notificationBuilder);
